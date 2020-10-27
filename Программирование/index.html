@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Тестовое задание</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css" crossorigin="anonymous">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chance/1.1.7/chance.min.js" crossorigin="anonymous"></script>
+    <script type="application/javascript">
+        chance.mixin({
+            svg: function (options) {
+                options = options || {};
+                options.size = options.max_size || 30;
+                if (typeof options.lines === 'undefined') options.lines = 20;
+                if (typeof options.circles === 'undefined') options.circles = 10;
+                if (typeof options.triangles === 'undefined') options.triangles = 10;
+                if (typeof options.opacity === 'undefined') options.opacity = 0.3;
+                options.background = options.background || chance.color();
+
+                // Create a coordinate within an area bigger than the svg
+                function point(min, max) {
+                    return chance.integer({min: min || -50, max: max || 150});
+                }
+
+                // Generate the actual svg
+                // Docs: developer.mozilla.org/en-US/docs/Web/SVG/Element/line
+                // viewBox use: stackoverflow.com/q/17498855
+                var svg = '<svg version="1.1" viewBox="0 0 100 100"';
+                svg += 'xmlns="http://www.w3.org/2000/svg"';
+                svg += 'style="background-color:' + options.background + '">';
+                for (var i = 0; i < options.lines; i++) {
+                    svg += '<line stroke="' + chance.color() + '" ';
+                    svg += 'stroke-width="' + point(1, 5) + '" ';
+                    svg += 'opacity="' + options.opacity + '" ';
+                    svg += 'x1="' + point() + '" y1="' + point() + '" ';
+                    svg += 'x2="' + point() + '" y2="' + point() + '" />';
+                }
+                for (var i = 0; i < options.circles; i++) {
+                    svg += '<circle cx="' + point() + '" ';
+                    svg += 'cy="' + point() + '" ';
+                    svg += 'r="' + point(1, options.max_size / 2) + '" ';
+                    svg += 'opacity="' + options.opacity + '" ';
+                    svg += 'fill="' + chance.color() + '"/>';
+                }
+                for (var i = 0; i < options.triangles; i++) {
+                    var s = size = options.max_size;
+                    svg += '<polygon fill="' + chance.color() + '" points="';
+                    svg += (x = point()) + ',' + (y = point()) + ' ';
+                    svg += (x + point(-s, s)) + ',' + (y + point(-s, s)) + ' ';
+                    svg += (x + point(-s, s)) + ',' + (y + point(-s, s));
+                    svg += '" opacity="' + options.opacity + '" ';
+                    svg += 'fill="' + chance.color() + '"/>';
+                }
+                return svg + '</svg>';
+            }
+        });
+    </script>
+    <style type="text/css">
+        .tabs {
+            margin-bottom: -1px !important;
+        }
+
+        .tab-content {
+            border: 1px solid #DBDBDB;
+            padding: 30px;
+        }
+
+        .tab-pane {
+            display: none;
+        }
+
+        .is-active {
+            display: initial;
+        }
+
+        .avatar svg {
+            width: 40px;
+            height: 40px;
+        }
+    </style>
+</head>
+<body>
+<div class="columns">
+    <div class="column is-half">
+        <article class="message">
+            <div class="message-header">
+                <p>Описание задачи</p>
+            </div>
+            <div class="message-body">
+                У страницы проблемы с производительностью, надо их решить или предложить способы решения (если нет
+                времени реализовать).<br/>
+                Основные проблемы это время начальной загрузки и время переключения между
+                вкладками.
+            </div>
+        </article>
+    </div>
+</div>
+<div class="tabs is-boxed">
+    <ul>
+        <li class="is-active">
+            <a id="tab1" data-url="https://jsonplaceholder.typicode.com/users" data-title="username"
+               data-content="name">
+                <span>Users</span>
+            </a>
+        </li>
+        <li>
+            <a id="tab2" data-url="https://jsonplaceholder.typicode.com/photos" data-title="title"
+               data-content="thumbnailUrl">
+                <span>Photos</span>
+            </a>
+        </li>
+        <li>
+            <a id="tab3" data-url="https://jsonplaceholder.typicode.com/posts" data-title="title" data-content="body">
+                <span>Posts</span>
+            </a>
+        </li>
+        <li>
+            <a id="tab4" data-url="https://jsonplaceholder.typicode.com/comments" data-title="name" data-content="body">
+                <span>Comments</span>
+            </a>
+        </li>
+    </ul>
+</div>
+
+<div class="tab-content">
+    <div class="tab-pane is-active" id="tab1"></div>
+    <div class="tab-pane" id="tab2"></div>
+    <div class="tab-pane" id="tab3"></div>
+    <div class="tab-pane" id="tab4"></div>
+</div>
+<template id="item">
+    <div class="card">
+        <div class="card-content">
+            <div class="media">
+                <div class="media-left">
+                    <figure class="image is-48x48 avatar">
+                    </figure>
+                </div>
+                <div class="media-content">
+                    <p class="title is-4">John Smith</p>
+                </div>
+            </div>
+
+            <div class="content">
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                Phasellus nec iaculis mauris. <a>@bulmaio</a>.
+            </div>
+        </div>
+    </div>
+</template>
+<script type="application/javascript">
+    window.onload = () => {
+        document.querySelectorAll('.tabs').forEach((tab) => {
+            tab.querySelectorAll('li').forEach((li) => {
+                li.onclick = () => {
+                    tab.querySelector('li.is-active').classList.remove('is-active')
+                    li.classList.add('is-active')
+                    tab.nextElementSibling.querySelector('.tab-pane.is-active').classList.remove('is-active')
+                    tab.nextElementSibling.querySelector('.tab-pane#' + li.firstElementChild.getAttribute('id'))
+                        .classList.add("is-active")
+                    render()
+                }
+            })
+        })
+        function createItem(data, title_field, content_field) {
+            console.log(data, content_field)
+            let item = document.getElementById('item').content.cloneNode(true)
+            let svg = chance.svg({
+                triangles: 10,
+                lines: 10,
+                circles: 10,
+                max_size: 30,
+                opacity: 0.3
+            });
+            item.querySelector('.content').innerHTML = data[content_field]
+            item.querySelector('.title').innerHTML = data[title_field]
+            item.querySelector('.avatar').innerHTML = svg
+            return item
+        }
+        let content = []
+        document.querySelectorAll('.tabs a').forEach((tab_header) => {
+            if (!tab_header.dataset.rendered) {
+                let tab_id = tab_header.getAttribute('id')
+                let title_field = tab_header.dataset.title
+                let content_field = tab_header.dataset.content
+                fetch(tab_header.dataset.url).then(response => response.json()).then(response => {
+                    for (let data of response) {
+                        content.push({
+                            tabId: tab_id,
+                            data: data,
+                            titleField: title_field,
+                            contentField: content_field
+                        })
+                    }
+                    tab_header.dataset.rendered = true
+                    render()
+                })
+            }
+        })
+
+        let renderLastRun = (new Date()).getTime()
+        function render() {
+            const timeNow = (new Date()).getTime()
+            if (timeNow - renderLastRun > 5) {
+                renderLastRun = timeNow
+                const activeTabId = document.querySelector('li.is-active a').id
+                const cardHeight = 144
+                const activeTabChildCount = document.querySelector(`.tab-pane#${activeTabId}`).childElementCount
+                const fullPaddingTop = activeTabChildCount * cardHeight
+                const isNeedAppendElement = (fullPaddingTop - window.scrollY) < 500 ? true : false
+                if (isNeedAppendElement) {
+                    let i = 0;
+                    content.forEach((contentElement) => {
+                        if (contentElement.tabId == activeTabId && i <= activeTabChildCount + 10 && i >= activeTabChildCount) {
+                            let tab_content = document.querySelector('div#' + contentElement.tabId)
+                            let item = createItem(contentElement.data, contentElement.titleField, contentElement.contentField)
+                            tab_content.appendChild(item)
+                        }
+                        if (contentElement.tabId == activeTabId) {
+                            i++
+                        }
+                    })
+                }
+            }
+        }
+        window.addEventListener('scroll', function () {
+            render()
+        });
+    }
+
+</script>
+</body>
+</html>
